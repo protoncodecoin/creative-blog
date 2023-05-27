@@ -37,10 +37,10 @@ async def get_article(id: PydanticObjectId):
 
 
 @article_route.post("/create", status_code=201)
-async def create_article(payload: Article, current_publisher: Publisher = Depends(get_current_user)):
+async def create_article(payload: Article):
     """ Create Article"""
-    if current_publisher.email:
-        payload.publisher = current_publisher
+    # if current_publisher.email:
+    #     payload.publisher = current_publisher
     await post_database.save(payload)
     return {
         "message": "Series Created Successfully"

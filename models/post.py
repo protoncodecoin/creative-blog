@@ -13,7 +13,7 @@ class Article(Document):
     content: str
     image_url: Optional[str] = None
     created: Optional[datetime] = datetime.now()
-    publisher: Publisher
+    # publisher: Publisher
 
     class Settings:
         name = "series"
