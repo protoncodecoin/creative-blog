@@ -1,0 +1,6 @@
+.idea/
+__pycache__/
+notes.md
+__init__.py
+creativeDB/
+.env
