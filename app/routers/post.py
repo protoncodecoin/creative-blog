@@ -1,7 +1,8 @@
 from fastapi import APIRouter, status, HTTPException, Depends
 from ..db.database import QueryDatabase
-from ..models.post import Article, ArticleUpdate
+from ..models.post import Article, ArticleUpdate, ArticleResponse
 from ..models.publisher import Publisher
+from ..models.token import TokenData
 
 from ..auth.authenticate import get_current_user
 
@@ -13,11 +14,11 @@ from beanie import PydanticObjectId
 article_route = APIRouter(tags=["posts"])
 
 post_database = QueryDatabase(Article)
-episodes_database = QueryDatabase(Publisher)
+publisher_db = QueryDatabase(Publisher)
 
 
-@article_route.get("/all")
-async def get_articles() -> List[Article]:
+@article_route.get("/all", response_model=List[ArticleResponse])
+async def get_articles():
     """ Retrieve all Articles"""
     articles = await post_database.get_all()
     if not articles:
@@ -38,10 +39,10 @@ async def get_article(id: PydanticObjectId):
 
 
 @article_route.post("/create", status_code=201)
-async def create_article(payload: Article):
+async def create_article(payload: Article, current_publisher: TokenData = Depends(get_current_user)):
     """ Create Article"""
-    # if current_publisher.email:
-    #     payload.publisher = current_publisher
+    publisher = await publisher_db.get_user_by_email(current_publisher.email)
+    payload.publisher = publisher
     await post_database.save(payload)
     return {
         "message": "Series Created Successfully"
@@ -49,8 +50,15 @@ async def create_article(payload: Article):
 
 
 @article_route.put("/update/{id}", response_model=Article, status_code=200)
-async def update_article(id: PydanticObjectId, payload: ArticleUpdate):
+async def update_article(id: PydanticObjectId, payload: ArticleUpdate,
+                         current_publisher: TokenData = Depends(get_current_user)):
     """ Update a specific article by providing the ID"""
+    existing_article = await post_database.get_by_id(id)
+    if not existing_article.publisher.email == current_publisher.email:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid publisher credentials to perform requested action"
+        )
     article_update = await post_database.update(id, payload)
     if not article_update:
         raise HTTPException(
@@ -61,8 +69,10 @@ async def update_article(id: PydanticObjectId, payload: ArticleUpdate):
 
 
 @article_route.delete("/delete/all")
-async def delete_all_articles():
+async def delete_all_articles(current_publisher: TokenData = Depends(get_current_user)):
     """Delete all articles from the db"""
+    # get all posts for publisher
+    posts = await post_database.get_all()
     await post_database.delete_all()
     return {
         "message": "Articles deleted"

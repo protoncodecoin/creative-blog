@@ -13,7 +13,7 @@ class Article(Document):
     content: str
     image_url: Optional[str] = None
     created: Optional[datetime] = datetime.now()
-    # publisher: Publisher
+    publisher: Optional[Publisher] = None
 
     class Settings:
         name = "series"
@@ -43,5 +43,30 @@ class ArticleUpdate(BaseModel):
                 "title": "The Old gods vd The new gods",
                 "content": "This story tells the brutal battle that happened between the ....",
                 "image_url": "https://www.legacystories.com/old-gods-vs-new-gods.jpg",
+            }
+        }
+
+
+class ArticleResponse(BaseModel):
+    # id: PydanticObjectId
+    title: str
+    content: str
+    image_url: Optional[str] = None
+    created: Optional[datetime] = datetime.now()
+    # publisher: Optional[Publisher] = None
+
+    class Settings:
+        name = "series"
+        indexes = [
+           IndexModel([("title", DESCENDING)])
+        ]
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "title": "Attack On Titans",
+                "content": "A world dominated my giant flesh eating creatures",
+                "image_url": "https://www.globephotography.com/kingfisher.jpg",
+                "created": datetime.now(),
             }
         }
