@@ -59,3 +59,26 @@ async def update_article(id: PydanticObjectId, payload: ArticleUpdate):
         )
     return article_update
 
+
+@article_route.delete("/delete/all")
+async def delete_all_articles():
+    """Delete all articles from the db"""
+    await post_database.delete_all()
+    return {
+        "message": "Articles deleted"
+    }
+
+
+@article_route.delete("/delete/{id}")
+async def delete_article(id: PydanticObjectId):
+    """ Delete an article with the specified id"""
+    article = await post_database.get_by_id(id)
+    if not article:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Article with the specified id {id} not found"
+        )
+    await post_database.delete(id)
+    return {
+        "message": "Article was deleted"
+    }
