@@ -82,7 +82,7 @@ async def get_all_accounts() -> List[Publisher]:
 
 
 @publisher_route.get("/account/{id}")
-async def delete_publisher(id: PydanticObjectId):
+async def get_publisher_by_id(id: PydanticObjectId):
     """ Delete user from database based on provided PydanticObjectId"""
     user_exit = await database.get_by_id(id)
     if user_exit is None:
@@ -99,7 +99,7 @@ async def get_publisher_by_email(email: str):
     """Get account by email provided.
         For Debugging"""
     users = await database.get_user_by_email(email)
-    print(users)
+    # print(users)
 
     if users is None:
         raise HTTPException(
