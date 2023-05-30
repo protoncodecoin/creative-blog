@@ -72,10 +72,18 @@ async def update_article(id: PydanticObjectId, payload: ArticleUpdate,
 async def delete_all_articles(current_publisher: TokenData = Depends(get_current_user)):
     """Delete all articles from the db"""
     # get all posts for publisher
-    posts = await post_database.get_all()
-    await post_database.delete_all()
+    publisher = await publisher_db.get_user_by_email(current_publisher.email)
+    if not publisher:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="You are not authorized for this action"
+        )
+    await post_database.delete_all_publisher_posts(current_publisher.email)
+
+    # posts = await post_database.get_all()
+    # await post_database.delete_all()
     return {
-        "message": "Articles deleted"
+        "message": f"Articles deleted for publisher {publisher.username}"
     }
 
 

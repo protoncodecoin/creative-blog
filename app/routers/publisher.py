@@ -11,14 +11,14 @@ from datetime import timedelta
 
 from ..models.token import Token
 
+from ..db.database import Settings
+
 publisher_route = APIRouter(tags=['publisher'])
 
 database = QueryDatabase(Publisher)
 password_utility = utility.HashPassword()
 
-SECRET_KEY = "33830acfe34d1a29602ebcd2fca655828f7d2fea68d562b7cb62dacd76c443b9"
-ALGORITHM = "HS265"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+settings = Settings()
 
 
 @publisher_route.post("/signup", status_code=201)
@@ -60,7 +60,7 @@ async def signin_publisher(form_data: OAuth2PasswordRequestForm = Depends()):
             status_code=status.HTTP_401_UNAUTHORIZED
         )
 
-    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
         data={"username": user_exist.username, "email": user_exist.email}, expire_delta=access_token_expires
     )

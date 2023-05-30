@@ -76,6 +76,15 @@ class QueryDatabase:
         return True
 
     async def delete_all(self):
-        """clear the database. Be careful with this method as it wipes the DB clean"""
+        """clear the database. Be careful with this method as it wipes clean the db"""
         await self.model.find_all().delete()
         return True
+
+    async def all_publisher_posts(self, email):
+        """ Get posts related to publisher"""
+        documents = self.model.find(self.model.publisher.email == email)
+        return documents
+
+    async def delete_all_publisher_posts(self, email):
+        """ Delete all posts related created by publisher"""
+        documents = await self.model.find(self.model.publisher.email == email)
