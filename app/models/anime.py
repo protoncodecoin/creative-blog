@@ -83,8 +83,9 @@ class Episode(Document):
     class Config:
         schema_extra = {
             "example": {
-                "epi_title": "The dark chambers of abyss",
+                "anime_title": "The Messanger from Abyss",
                 "season": "1",
+                "epi_title": "The dark chambers of abyss",
                 "epi_number": 1,
                 "created": datetime.now(),
                 "content": "file"
@@ -95,5 +96,6 @@ class Episode(Document):
 class EpisodeUpdate(BaseModel):
     anime_title: Optional[str]
     season: Optional[int]
+    epi_title: Optional[str]
     epi_number: Optional[int]
     content: Optional[str]
