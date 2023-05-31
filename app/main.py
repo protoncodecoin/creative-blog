@@ -4,14 +4,18 @@ from .db import database
 
 from app.routers.post import article_route
 from app.routers.publisher import publisher_route
+from app.routers.anime import anime_router
+from app.routers.episode import episode_router
 
 app = FastAPI()
 
 database = database.Settings()
 
 
-app.include_router(article_route, prefix="/articles")
-app.include_router(publisher_route, prefix="/publisher")
+app.include_router(article_route, prefix="/articles", tags=["articles"])
+app.include_router(publisher_route, prefix="/publisher", tags=["publisher"])
+app.include_router(anime_router, prefix="/anime", tags=["anime"])
+app.include_router(episode_router, prefix="/episode", tags=["episode"])
 
 
 @app.on_event("startup")
