@@ -1,5 +1,5 @@
 <h1>Creative Blog</h1>
-<p>An API for creating and publishing blogs. Also extends functionality by assisting animators create, post and share their content to their target audience.</p>
+<p>An API for creating and publishing blogs. This is also built as an Anime API</p>
 
 <h2>Technology Used</h2>
 <ul>
