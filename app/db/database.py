@@ -1,12 +1,13 @@
 from beanie import init_beanie, PydanticObjectId
 from motor.motor_asyncio import AsyncIOMotorClient
+from fastapi import HTTPException, status
 
 from pydantic import BaseModel, BaseSettings
 
 from typing import Any, List, Optional
 
 # from models import post, publisher
-from ..models import post, publisher
+from ..models import post, publisher, anime
 
 
 class Settings(BaseSettings):
@@ -21,7 +22,8 @@ class Settings(BaseSettings):
         )
 
         await init_beanie(database=client.db_name, document_models=[post.Article,
-                                                                    publisher.Publisher])
+                                                                    publisher.Publisher, anime.Anime,
+                                                                    anime.Episode])
 
     class Config:
         env_file = ".env"
@@ -37,10 +39,14 @@ class QueryDatabase:
         return
 
     async def get_by_id(self, id: PydanticObjectId) -> Any:
+        """ get the document by id"""
         document = await self.model.get(id)
         if document:
             return document
-        return False
+        raise HTTPException(
+            detail="Document with the specified does not exist",
+            status_code=status.HTTP_404_NOT_FOUND
+        )
 
     async def get_all(self) -> List[Any]:
         """ Get all documents from the database"""
@@ -50,6 +56,11 @@ class QueryDatabase:
     async def get_user_by_email(self, email):
         """ Get document by email"""
         document = await self.model.find_one(self.model.email == email)
+        if not document:
+            raise HTTPException(
+                detail="user with specified email not found",
+                status_code=status.HTTP_404_NOT_FOUND
+            )
         return document
 
     async def update(self, id: PydanticObjectId, body: BaseModel) -> Any:
@@ -63,7 +74,10 @@ class QueryDatabase:
 
         document = await self.get_by_id(document_id)
         if not document:
-            return False
+            raise HTTPException(
+                detail="Document with the specified id does not exist",
+                status_code=status.HTTP_404_NOT_FOUND
+            )
         await document.update(updated_query)
         return document
 
@@ -71,7 +85,10 @@ class QueryDatabase:
         """ Delete document from the DB using the supplied id"""
         document = await self.model.get(id)
         if not document:
-            return False
+            raise HTTPException(
+                detail="Document with the specified id does not exist",
+                status_code=status.HTTP_404_NOT_FOUND
+            )
         await document.delete()
         return True
 
@@ -82,9 +99,15 @@ class QueryDatabase:
 
     async def all_publisher_posts(self, email):
         """ Get posts related to publisher"""
-        documents = self.model.find(self.model.publisher.email == email)
+        documents = await self.model.find(self.model.publisher.email == email)
         return documents
 
     async def delete_all_publisher_posts(self, email):
         """ Delete all posts related created by publisher"""
-        documents = await self.model.find(self.model.publisher.email == email)
+        await self.model.find(self.model.publisher.email == email)
+
+    async def get_anime_by_title(self, title, document):
+        """ Get anime by title"""
+        document = await self.model.find(document.title == title).to_list()
+        return document
+

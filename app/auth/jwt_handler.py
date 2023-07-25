@@ -5,8 +5,6 @@ from ..db.database import Settings
 
 settings = Settings()
 
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
-
 
 def create_access_token(data: dict, expire_delta: timedelta | None = None):
     to_encode = data.copy()

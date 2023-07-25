@@ -1,7 +1,7 @@
 from fastapi import APIRouter, status, HTTPException, Depends
 from ..db.database import QueryDatabase
 from ..models.post import Article, ArticleUpdate, ArticleResponse
-from ..models.publisher import Publisher
+from ..models.publisher import Publisher, UserResponse
 from ..models.token import TokenData
 
 from ..auth.authenticate import get_current_user

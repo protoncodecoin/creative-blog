@@ -3,7 +3,7 @@ from datetime import datetime
 from pymongo import IndexModel, DESCENDING
 from pydantic import BaseModel
 
-from ..models.publisher import Publisher
+from ..models.publisher import Publisher, UserResponse
 
 from typing import Optional
 
@@ -53,20 +53,20 @@ class ArticleResponse(BaseModel):
     content: str
     image_url: Optional[str] = None
     created: Optional[datetime] = datetime.now()
-    # publisher: Optional[Publisher] = None
+    publisher: Optional[str] = None
 
-    class Settings:
-        name = "series"
-        indexes = [
-           IndexModel([("title", DESCENDING)])
-        ]
+    # class Settings:
+    #     name = "series"
+    #     indexes = [
+    #        IndexModel([("title", DESCENDING)])
+    #     ]
 
-    class Config:
-        schema_extra = {
-            "example": {
-                "title": "Attack On Titans",
-                "content": "A world dominated my giant flesh eating creatures",
-                "image_url": "https://www.globephotography.com/kingfisher.jpg",
-                "created": datetime.now(),
-            }
-        }
+    # class Config:
+    #     schema_extra = {
+    #         "example": {
+    #             "title": "Attack On Titans",
+    #             "content": "A world dominated my giant flesh eating creatures",
+    #             "image_url": "https://www.globephotography.com/kingfisher.jpg",
+    #             "created": datetime.now(),
+    #         }
+    #     }
